@@ -17,7 +17,10 @@
   },
   "author": "Nathan Friedly - http://nfriedly.com/",
   "license": "MIT",
-  "repository": "git@github.com:nfriedly/node-bestzip.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/nfriedly/node-bestzip.git"
+  },
   "homepage": "https://github.com/nfriedly/node-bestzip",
   "files": [
     "bin/cli.js",
