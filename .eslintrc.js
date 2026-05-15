@@ -1,6 +1,4 @@
-"use strict";
-
-module.exports = {
+export default {
   env: {
     node: true,
     es2024: true,
