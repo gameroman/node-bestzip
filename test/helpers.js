@@ -8,9 +8,9 @@ const init = (name) => {
   fs.mkdirSync(tmpdir, { recursive: true });
   const destination = path.join(tmpdir, "test.zip");
   const cleanup = async () => {
-    await fsp.rm(tmpdir, { recursive: true });
+    await fsp.rm(tmpdir, { recursive: true, force: true });
     await fsp.mkdir(tmpdir, { recursive: true });
-    await fsp.rm("test/fixtures/injection", { recursive: true });
+    await fsp.rm("test/fixtures/injection", { recursive: true, force: true });
   };
   return { tmpdir, destination, cleanup };
 };

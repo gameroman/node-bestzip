@@ -11,7 +11,7 @@ const __dirname = import.meta.dirname;
 
 import unzip from "./unzip.js";
 
-import bestzip from "../lib/bestzip.js";
+import * as bestzip from "../lib/bestzip.js";
 
 const cli = path.join(__dirname, "../bin/cli.js");
 
@@ -121,7 +121,7 @@ describe("file structure", () => {
 
   for (const testCase of testCases) {
     test(`programmatic: ${JSON.stringify(testCase)}`, async (t) => {
-      await bestzip(
+      await bestzip.zip(
         Object.assign(
           { destination, cwd: path.join(__dirname, "../", testCase.cwd) },
           testCase

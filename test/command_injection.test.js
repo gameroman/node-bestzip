@@ -1,5 +1,5 @@
 import { describe, test, beforeEach, after } from "node:test";
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import * as bestzip from "../lib/bestzip.js";
 import { init } from "./helpers.js";
 

@@ -1,8 +1,8 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import { describe, test, beforeEach, after } from "node:test";
-import { init } from "./helpers";
-import * as bestzip from "../lib/bestzip";
+import { init } from "./helpers.js";
+import * as bestzip from "../lib/bestzip.js";
 
 const { destination, cleanup } = init("perf");
 

@@ -3,8 +3,9 @@
 import * as bestzip from "../lib/bestzip.js";
 
 import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
-const argv = yargs
+const argv = yargs(hideBin(process.argv))
   .usage("\nUsage: bestzip destination.zip sources/")
   .option("force", {
     describe: "Force use of node.js or native zip methods",
