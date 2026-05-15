@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import zip from "../lib/bestzip.js";
+import * as bestzip from "../lib/bestzip.js";
 
 import yargs from "yargs";
 
@@ -27,10 +27,14 @@ if (argv.level < -1 || argv.level > 9) {
 
 console.log("Writing %s to %s...", source.join(", "), destination);
 
+let zip;
+
 if (argv.force === "node") {
-  zip = zip.nodeZip;
+  zip = bestzip.nodeZip;
 } else if (argv.force === "native") {
-  zip = zip.nativeZip;
+  zip = bestzip.nativeZip;
+} else {
+  zip = bestzip.zip;
 }
 
 zip({

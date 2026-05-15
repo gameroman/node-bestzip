@@ -1,5 +1,5 @@
 import path from "node:path";
-import fs from "node:fs/promises"
+import fs from "node:fs/promises";
 import { init } from "./helpers";
 
 const { destination, cleanup } = init("perf");
