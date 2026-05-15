@@ -91,7 +91,6 @@ describe("file structure", () => {
   for (const testCase of testCases) {
     test(
       `cli with --force=node: ${JSON.stringify(testCase)}`,
-      { skip: !hasNativeZip },
       async (t) => {
         const sourceArgs =
           typeof testCase.source === "string"
@@ -144,7 +143,6 @@ describe("file structure", () => {
   for (const testCase of testCases) {
     test(
       `programmatic with nodeZip: ${JSON.stringify(testCase)}`,
-      { skip: !hasNativeZip },
       async (t) => {
         await bestzip.nodeZip(
           Object.assign(
