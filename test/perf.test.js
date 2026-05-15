@@ -12,10 +12,10 @@ describe("Performance", () => {
 
   const getPerf = async (zipFn) => {
     const start = Date.now();
-    await zipFn({ 
-      cwd: path.join(import.meta.dirname, "../"), 
-      source: "*", 
-      destination 
+    await zipFn({
+      cwd: path.join(import.meta.dirname, "../"),
+      source: "*",
+      destination,
     });
     const duration = Date.now() - start;
 

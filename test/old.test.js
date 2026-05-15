@@ -41,10 +41,14 @@ describe("bestzip", function () {
     afterEach(async function () {
       try {
         await fs.rm(extractFolderPath, { recursive: true, force: true });
-      } catch {}
+      } catch {
+        // ignore
+      }
       try {
         await fs.rm(destinationFilePath, { force: true });
-      } catch {}
+      } catch {
+        // ignore
+      }
     });
 
     it("should create archive", async function () {
@@ -82,11 +86,18 @@ describe("bestzip", function () {
 
       afterEach(async function () {
         try {
-          await fs.rm(validArchiveExtractFolder, { recursive: true, force: true });
-        } catch {}
+          await fs.rm(validArchiveExtractFolder, {
+            recursive: true,
+            force: true,
+          });
+        } catch {
+          // ignore
+        }
         try {
           await fs.rm(validArchiveFilePath, { force: true });
-        } catch {}
+        } catch {
+          // ignore
+        }
       });
 
       it("should contain valid data after unarchive", async function () {
@@ -141,10 +152,14 @@ describe("bestzip", function () {
     afterEach(async function () {
       try {
         await fs.rm(extractFolderPath, { recursive: true, force: true });
-      } catch {}
+      } catch {
+        // ignore
+      }
       try {
         await fs.rm(destinationFilePath, { force: true });
-      } catch {}
+      } catch {
+        // ignore
+      }
     });
 
     it("should create archive", async function () {
@@ -203,11 +218,18 @@ describe("bestzip", function () {
 
       afterEach(async function () {
         try {
-          await fs.rm(validArchiveExtractFolder, { recursive: true, force: true });
-        } catch {}
+          await fs.rm(validArchiveExtractFolder, {
+            recursive: true,
+            force: true,
+          });
+        } catch {
+          // ignore
+        }
         try {
           await fs.rm(validArchiveFilePath, { force: true });
-        } catch {}
+        } catch {
+          // ignore
+        }
       });
 
       it("should contain valid data after unarchive", async function () {

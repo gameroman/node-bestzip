@@ -181,7 +181,9 @@ describe("file structure", () => {
       `same output between native and node zip with absolute file paths: ${args}`,
       { skip: !hasNativeZip },
       async () => {
-        child_process.execSync(`node ${cli} --force=node ${destination} ${args}`);
+        child_process.execSync(
+          `node ${cli} --force=node ${destination} ${args}`
+        );
 
         await unzip(destination, tmpdir);
         const nodeStructure = getStructure(tmpdir);
