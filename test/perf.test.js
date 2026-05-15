@@ -1,10 +1,10 @@
-"use strict";
-const path = require("path");
-const { init, stat } = require("./helpers");
+import path from "node:path";
+import fs from "node:fs/promises"
+import { init } from "./helpers";
 
 const { destination, cleanup } = init("perf");
 
-const bestzip = require("../lib/bestzip");
+import * as bestzip from "../lib/bestzip";
 
 describe("Performance", () => {
   beforeEach(cleanup);
@@ -18,7 +18,7 @@ describe("Performance", () => {
     );
     const duration = Date.now() - start;
 
-    const size = (await stat(destination)).size; /* bytes */
+    const size = (await fs.stat(destination)).size; /* bytes */
     return { duration, size };
   };
 

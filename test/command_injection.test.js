@@ -1,8 +1,6 @@
-"use strict";
-
-const bestzip = require("../lib/bestzip");
-const fs = require("fs");
-const { init } = require("./helpers");
+import bestzip from "../lib/bestzip";
+import fs from "node:fs";
+import { init } from "./helpers";
 
 const { destination, cleanup } = init("command_injection");
 

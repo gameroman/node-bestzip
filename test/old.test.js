@@ -1,14 +1,11 @@
-"use strict";
+import chai from "chai";
+const expect = chai.expect;
+import path from "node:path";
+import fs from "node:fs";
+import CliTest from "command-line-test";
 
-var chai = require("chai");
-var expect = chai.expect;
-var path = require("path");
-var fs = require("fs");
-var rimraf = require("rimraf");
-var CliTest = require("command-line-test");
-
-var zip = require("../lib/bestzip.js");
-var unzip = require("./unzip");
+import zip from "../lib/bestzip.js";
+import unzip from "./unzip";
 
 describe("bestzip", function () {
   describe("when initialized", function () {
@@ -40,8 +37,8 @@ describe("bestzip", function () {
     });
 
     afterEach(function (done) {
-      rimraf(extractFolderPath, function () {
-        rimraf(destinationFilePath, done);
+      fs.rm(extractFolderPath, function () {
+        fs.rm(destinationFilePath, done);
       });
     });
 
@@ -81,8 +78,8 @@ describe("bestzip", function () {
         validArchiveExtractedFile1Path;
 
       afterEach(function (done) {
-        rimraf(validArchiveExtractFolder, function () {
-          rimraf(validArchiveFilePath, done);
+        fs.rm(validArchiveExtractFolder, function () {
+          fs.rm(validArchiveFilePath, done);
         });
       });
 
@@ -147,8 +144,8 @@ describe("bestzip", function () {
     });
 
     afterEach(function (done) {
-      rimraf(extractFolderPath, function () {
-        rimraf(destinationFilePath, done);
+      fs.rm(extractFolderPath, function () {
+        fs.rm(destinationFilePath, done);
       });
     });
 
@@ -209,8 +206,8 @@ describe("bestzip", function () {
       });
 
       afterEach(function (done) {
-        rimraf(validArchiveExtractFolder, function () {
-          rimraf(validArchiveFilePath, done);
+        fs.rm(validArchiveExtractFolder, function () {
+          fs.rm(validArchiveFilePath, done);
         });
       });
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-"use strict";
+import zip from "../lib/bestzip.js";
 
-var zip = require("../lib/bestzip.js");
+import yargs from "yargs";
 
-var argv = require("yargs")
+const argv = yargs
   .usage("\nUsage: bestzip destination.zip sources/")
   .option("force", {
     describe: "Force use of node.js or native zip methods",
@@ -17,8 +17,8 @@ var argv = require("yargs")
   })
   .demand(2).argv;
 
-var destination = argv._.shift();
-var source = argv._;
+const destination = argv._.shift();
+const source = argv._;
 
 if (argv.level < -1 || argv.level > 9) {
   console.error("Invalid compression level, must be >= 0 and <= 9");
@@ -34,8 +34,8 @@ if (argv.force === "node") {
 }
 
 zip({
-  source: source,
-  destination: destination,
+  source,
+  destination,
   verbose: !!argv.verbose,
   level: argv.level,
 })
