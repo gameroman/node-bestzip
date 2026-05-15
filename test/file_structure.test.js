@@ -89,33 +89,30 @@ describe("file structure", () => {
   }
 
   for (const testCase of testCases) {
-    test(
-      `cli with --force=node: ${JSON.stringify(testCase)}`,
-      async (t) => {
-        const sourceArgs =
-          typeof testCase.source === "string"
-            ? testCase.source
-            : testCase.source.join(" ");
+    test(`cli with --force=node: ${JSON.stringify(testCase)}`, async (t) => {
+      const sourceArgs =
+        typeof testCase.source === "string"
+          ? testCase.source
+          : testCase.source.join(" ");
 
-        child_process.execSync(
-          `node ${cli} --force=node ${destination} ${sourceArgs}`,
-          { cwd: path.join(__dirname, "../", testCase.cwd) }
-        );
+      child_process.execSync(
+        `node ${cli} --force=node ${destination} ${sourceArgs}`,
+        { cwd: path.join(__dirname, "../", testCase.cwd) }
+      );
 
-        await unzip(destination, tmpdir);
-        const structure = getStructure(tmpdir);
+      await unzip(destination, tmpdir);
+      const structure = getStructure(tmpdir);
 
-        t.assert.snapshot(structure);
+      t.assert.snapshot(structure);
 
-        // on systems *with* a native zip, this validates that both methods output the same thing (mac, linux)
-        if (testCase.structure) {
-          assert.deepEqual(structure, testCase.structure);
-        } else {
-          // the structure is defined in the first test run, so it may not be defined when running subsets of tests
-          console.log("skipping structure match");
-        }
+      // on systems *with* a native zip, this validates that both methods output the same thing (mac, linux)
+      if (testCase.structure) {
+        assert.deepEqual(structure, testCase.structure);
+      } else {
+        // the structure is defined in the first test run, so it may not be defined when running subsets of tests
+        console.log("skipping structure match");
       }
-    );
+    });
   }
 
   for (const testCase of testCases) {
@@ -141,29 +138,28 @@ describe("file structure", () => {
   }
 
   for (const testCase of testCases) {
-    test(
-      `programmatic with nodeZip: ${JSON.stringify(testCase)}`,
-      async (t) => {
-        await bestzip.nodeZip(
-          Object.assign(
-            { destination, cwd: path.join(__dirname, "../", testCase.cwd) },
-            testCase
-          )
-        );
-        await unzip(destination, tmpdir);
-        const structure = getStructure(tmpdir);
+    test(`programmatic with nodeZip: ${JSON.stringify(
+      testCase
+    )}`, async (t) => {
+      await bestzip.nodeZip(
+        Object.assign(
+          { destination, cwd: path.join(__dirname, "../", testCase.cwd) },
+          testCase
+        )
+      );
+      await unzip(destination, tmpdir);
+      const structure = getStructure(tmpdir);
 
-        t.assert.snapshot(structure);
+      t.assert.snapshot(structure);
 
-        // on systems *with* a native zip, this validates that both methods output the same thing (mac, linux)
-        if (testCase.structure) {
-          assert.deepEqual(structure, testCase.structure);
-        } else {
-          // the structure is defined in the first test run, so it may not be defined when running subsets of tests
-          console.log("skipping structure match");
-        }
+      // on systems *with* a native zip, this validates that both methods output the same thing (mac, linux)
+      if (testCase.structure) {
+        assert.deepEqual(structure, testCase.structure);
+      } else {
+        // the structure is defined in the first test run, so it may not be defined when running subsets of tests
+        console.log("skipping structure match");
       }
-    );
+    });
   }
 
   // we can't use snapshots here, because the absolute paths will change from one system to another
