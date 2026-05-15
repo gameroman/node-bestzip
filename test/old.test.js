@@ -1,21 +1,23 @@
-import chai from "chai";
-const expect = chai.expect;
 import path from "node:path";
-import fs from "node:fs";
+import fs from "node:fs/promises";
+import assert from "node:assert";
+import { describe, it, beforeEach, afterEach } from "node:test";
 import CliTest from "command-line-test";
 
 import zip from "../lib/bestzip.js";
-import unzip from "./unzip";
+import unzip from "./unzip.js";
+
+const __dirname = import.meta.dirname;
 
 describe("bestzip", function () {
   describe("when initialized", function () {
     it("should load bestzip", function () {
-      expect(zip).to.be.not.null;
+      assert.notEqual(zip, null);
     });
   });
 
   describe("When archiving a file", function () {
-    var destinationFile,
+    let destinationFile,
       file1File,
       extractFolder,
       fixturesFolder,
@@ -23,7 +25,7 @@ describe("bestzip", function () {
       file1Path,
       extractFolderPath;
 
-    beforeEach(function (done) {
+    beforeEach(async function () {
       destinationFile = "fakeDestination.zip";
       file1File = "file.txt";
       extractFolder = "extract";
@@ -33,96 +35,89 @@ describe("bestzip", function () {
       file1Path = path.join(__dirname, fixturesFolder, file1File);
       extractFolderPath = path.join(__dirname, extractFolder);
 
-      fs.mkdir(extractFolderPath, done);
+      await fs.mkdir(extractFolderPath, { recursive: true });
     });
 
-    afterEach(function (done) {
-      fs.rm(extractFolderPath, function () {
-        fs.rm(destinationFilePath, done);
-      });
+    afterEach(async function () {
+      try {
+        await fs.rm(extractFolderPath, { recursive: true, force: true });
+      } catch {}
+      try {
+        await fs.rm(destinationFilePath, { force: true });
+      } catch {}
     });
 
-    it("should create archive", function (done) {
-      zip(destinationFilePath, [file1Path], function (zipError) {
-        if (zipError) {
-          return done(zipError);
-        }
-
-        fs.stat(destinationFilePath, function (_error, stat) {
-          expect(stat).to.haveOwnProperty("birthtime");
-          done();
+    it("should create archive", async function () {
+      await new Promise((resolve, reject) => {
+        zip(destinationFilePath, [file1Path], function (zipError) {
+          if (zipError) return reject(zipError);
+          resolve();
         });
       });
+
+      const stat = await fs.stat(destinationFilePath);
+      assert.ok(Object.hasOwn(stat, "birthtime") || stat.birthtime);
     });
 
-    it("should create archive using CLI", function (done) {
-      var cliTest = new CliTest();
-      var bestzip = "node ./bin/cli.js";
+    it("should create archive using CLI", async function () {
+      const cliTest = new CliTest();
+      const bestzip = "node ./bin/cli.js";
 
-      // $ bestzip fakeDestination.zip fixtures/file.txt
-      cliTest.exec(
-        `${bestzip} ${destinationFilePath} ${file1Path}`,
-        function (err, res) {
-          if (err) {
-            return done(err);
+      await new Promise((resolve, reject) => {
+        cliTest.exec(
+          `${bestzip} ${destinationFilePath} ${file1Path}`,
+          function (err, res) {
+            if (err) return reject(err);
+            assert.match(res.stdout, /zipped!/);
+            resolve();
           }
-          expect(res.stdout).to.contain("zipped!");
-          done();
-        }
-      );
+        );
+      });
     });
 
     describe("Valid archive", function () {
-      var validArchiveFilePath,
+      let validArchiveFilePath,
         validArchiveExtractFolder,
         validArchiveExtractedFile1Path;
 
-      afterEach(function (done) {
-        fs.rm(validArchiveExtractFolder, function () {
-          fs.rm(validArchiveFilePath, done);
-        });
+      afterEach(async function () {
+        try {
+          await fs.rm(validArchiveExtractFolder, { recursive: true, force: true });
+        } catch {}
+        try {
+          await fs.rm(validArchiveFilePath, { force: true });
+        } catch {}
       });
 
-      it("should contain valid data after unarchive", function (done) {
+      it("should contain valid data after unarchive", async function () {
         validArchiveFilePath = path.join(__dirname, "validArchive.zip");
         validArchiveExtractFolder = path.join(__dirname, "validArchiveExtract");
         validArchiveExtractedFile1Path = path.join(
           __dirname,
           "validArchiveExtract",
-          __dirname.replace(/^[A-Z]:/, ""), // yes, it has the path twice. Regex to strip the leading C: or whatever on windows
+          __dirname.replace(/^[A-Z]:/, ""),
           fixturesFolder,
           file1File
         );
 
-        zip(validArchiveFilePath, [file1Path], function (zipError) {
-          if (zipError) {
-            return done(zipError);
-          }
-
-          unzip(validArchiveFilePath, validArchiveExtractFolder)
-            .then(() => {
-              fs.readFile(
-                validArchiveExtractedFile1Path,
-                function (readError, data) {
-                  if (readError) {
-                    return done(readError);
-                  }
-
-                  var content = data.toString().trim();
-                  expect(content).to.be.equal("this is a plain text file");
-
-                  done();
-                }
-              );
-            })
-            .catch(done);
+        await new Promise((resolve, reject) => {
+          zip(validArchiveFilePath, [file1Path], function (zipError) {
+            if (zipError) return reject(zipError);
+            resolve();
+          });
         });
+
+        await unzip(validArchiveFilePath, validArchiveExtractFolder);
+
+        const data = await fs.readFile(validArchiveExtractedFile1Path);
+        const content = data.toString().trim();
+        assert.strictEqual(content, "this is a plain text file");
       });
     });
   });
 
   describe("When archiving a folder", function () {
-    var destinationFile,
+    let destinationFile,
       file1File,
       extractFolder,
       fixturesFolder,
@@ -130,7 +125,7 @@ describe("bestzip", function () {
       file1Path,
       extractFolderPath;
 
-    beforeEach(function (done) {
+    beforeEach(async function () {
       destinationFile = "fakeDestination.zip";
       file1File = "file.txt";
       extractFolder = "extract";
@@ -140,88 +135,85 @@ describe("bestzip", function () {
       file1Path = path.join(__dirname, fixturesFolder);
       extractFolderPath = path.join(__dirname, extractFolder);
 
-      fs.mkdir(extractFolderPath, done);
+      await fs.mkdir(extractFolderPath, { recursive: true });
     });
 
-    afterEach(function (done) {
-      fs.rm(extractFolderPath, function () {
-        fs.rm(destinationFilePath, done);
-      });
+    afterEach(async function () {
+      try {
+        await fs.rm(extractFolderPath, { recursive: true, force: true });
+      } catch {}
+      try {
+        await fs.rm(destinationFilePath, { force: true });
+      } catch {}
     });
 
-    it("should create archive", function (done) {
-      zip(destinationFilePath, [file1Path], function (zipError) {
-        if (zipError) {
-          return done(zipError);
-        }
-        fs.stat(destinationFilePath, function (_error, stat) {
-          expect(stat).to.haveOwnProperty("birthtime");
-          done();
+    it("should create archive", async function () {
+      await new Promise((resolve, reject) => {
+        zip(destinationFilePath, [file1Path], function (zipError) {
+          if (zipError) return reject(zipError);
+          resolve();
         });
       });
+
+      const stat = await fs.stat(destinationFilePath);
+      assert.ok(Object.hasOwn(stat, "birthtime") || stat.birthtime);
     });
 
-    it("should create archive using CLI", function (done) {
-      var cliTest = new CliTest();
-      var bestzip = "node ./bin/cli.js";
+    it("should create archive using CLI", async function () {
+      const cliTest = new CliTest();
+      const bestzip = "node ./bin/cli.js";
 
-      // $ bestzip fakeDestination.zip fixtures/file.txt
-      cliTest.exec(
-        `${bestzip} ${destinationFilePath} ${file1Path}`,
-        function (err, res) {
-          if (err) {
-            return done(err);
+      await new Promise((resolve, reject) => {
+        cliTest.exec(
+          `${bestzip} ${destinationFilePath} ${file1Path}`,
+          function (err, res) {
+            if (err) return reject(err);
+            assert.match(res.stdout, /zipped!/);
+            resolve();
           }
-          expect(res.stdout).to.contain("zipped!");
-          done();
-        }
-      );
+        );
+      });
     });
 
     describe("Valid archive", function () {
-      var validArchiveFilePath,
+      let validArchiveFilePath,
         validArchiveExtractFolder,
         validArchiveExtractedFile1Path;
 
-      beforeEach(function (done) {
+      beforeEach(async function () {
         validArchiveFilePath = path.join(__dirname, "validArchive.zip");
         validArchiveExtractFolder = path.join(__dirname, "validArchiveExtract");
         validArchiveExtractedFile1Path = path.join(
           __dirname,
           "validArchiveExtract",
-          __dirname.replace(/^[A-Z]:/, ""), // yes, it has the path twice. Regex to strip the leading C: or whatever on windows
+          __dirname.replace(/^[A-Z]:/, ""),
           fixturesFolder,
           file1File
         );
 
-        zip(validArchiveFilePath, [file1Path], function (zipError) {
-          if (zipError) {
-            return done(zipError);
-          }
-
-          unzip(validArchiveFilePath, validArchiveExtractFolder)
-            .then(done)
-            .catch(done);
+        await new Promise((resolve, reject) => {
+          zip(validArchiveFilePath, [file1Path], function (zipError) {
+            if (zipError) return reject(zipError);
+            resolve();
+          });
         });
+
+        await unzip(validArchiveFilePath, validArchiveExtractFolder);
       });
 
-      afterEach(function (done) {
-        fs.rm(validArchiveExtractFolder, function () {
-          fs.rm(validArchiveFilePath, done);
-        });
+      afterEach(async function () {
+        try {
+          await fs.rm(validArchiveExtractFolder, { recursive: true, force: true });
+        } catch {}
+        try {
+          await fs.rm(validArchiveFilePath, { force: true });
+        } catch {}
       });
 
-      it("should contain valid data after unarchive", function (done) {
-        fs.readFile(validArchiveExtractedFile1Path, function (readError, data) {
-          if (readError) {
-            return done(readError);
-          }
-
-          var content = data.toString().trim();
-          expect(content).to.be.equal("this is a plain text file");
-
-          done();
-        });
+      it("should contain valid data after unarchive", async function () {
+        const data = await fs.readFile(validArchiveExtractedFile1Path);
+        const content = data.toString().trim();
+        assert.strictEqual(content, "this is a plain text file");
       });
     });
   });

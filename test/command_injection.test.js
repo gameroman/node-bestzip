@@ -1,15 +1,15 @@
-import bestzip from "../lib/bestzip";
-import fs from "node:fs";
-import { init } from "./helpers";
+import { describe, test, beforeEach, after } from "node:test";
+import fs from "node:fs/promises";
+import * as bestzip from "../lib/bestzip.js";
+import { init } from "./helpers.js";
 
 const { destination, cleanup } = init("command_injection");
 
 describe("command injection", () => {
   const hasNativeZip = bestzip.hasNativeZip();
-  const testIfHasNativeZip = hasNativeZip ? test : test.skip;
 
   beforeEach(cleanup);
-  afterAll(cleanup);
+  after(cleanup);
 
   // https://www.npmjs.com/advisories/1554
   const testCases = [
@@ -54,21 +54,26 @@ describe("command injection", () => {
       destination: destination,
     },
   ];
-  testIfHasNativeZip.each(testCases)(
-    "should NOT execute commands from the list of sources: %s",
-    async (testCase) => {
-      try {
-        await bestzip(testCase);
-      } catch (ex) {
-        // Exceptions are allowed, that is invalid input.
-        // The important part is that it doesn't execute it.
-        // Some test cases will log "zip error: Nothing to do!" or similar - that is to be expected
+
+  for (const [index, testCase] of testCases.entries()) {
+    test(
+      `should NOT execute commands from the list of sources: ${index + 1}`,
+      { skip: !hasNativeZip },
+      async () => {
+        try {
+          await bestzip.zip(testCase);
+        } catch (ex) {
+          // Exceptions are allowed, that is invalid input.
+          // The important part is that it doesn't execute it.
+          // Some test cases will log "zip error: Nothing to do!" or similar - that is to be expected
+        }
+
+        if (fs.existsSync("test/fixtures/injection")) {
+          throw new Error(
+            "Bestzip appears to be vulnerable to command injection"
+          );
+        }
       }
-      if (fs.existsSync("test/fixtures/injection")) {
-        throw new Error(
-          "Bestzip appears to be vulnerable to command injection"
-        );
-      }
-    }
-  );
+    );
+  }
 });

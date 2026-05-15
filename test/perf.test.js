@@ -1,21 +1,22 @@
 import path from "node:path";
 import fs from "node:fs/promises";
+import { describe, test, beforeEach, after } from "node:test";
 import { init } from "./helpers";
+import * as bestzip from "../lib/bestzip";
 
 const { destination, cleanup } = init("perf");
 
-import * as bestzip from "../lib/bestzip";
-
 describe("Performance", () => {
   beforeEach(cleanup);
-  afterAll(cleanup);
+  after(cleanup);
 
   const getPerf = async (zipFn) => {
     const start = Date.now();
-    await zipFn(
-      // this will zip the entire project, node_modules and all
-      { cwd: path.join(__dirname, "../"), source: "*", destination }
-    );
+    await zipFn({ 
+      cwd: path.join(import.meta.dirname, "../"), 
+      source: "*", 
+      destination 
+    });
     const duration = Date.now() - start;
 
     const size = (await fs.stat(destination)).size; /* bytes */
@@ -24,6 +25,7 @@ describe("Performance", () => {
 
   test(
     "zip complete project (including node_modules)",
+    { timeout: 2 * 60 * 1000 },
     async () => {
       const hasNativeZip = bestzip.hasNativeZip();
       const nodeStats = await getPerf(bestzip.nodeZip);
@@ -42,7 +44,6 @@ describe("Performance", () => {
           `nativeZip took ${nativeStats.duration}ms (${durPctDif}%) to generate a file of ${nativeStats.size} bytes (${sizePctDif}%)`
         );
       }
-    },
-    2 * 60 * 1000
-  ); // third argument is timeout in ms
+    }
+  );
 });
