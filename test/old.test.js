@@ -39,16 +39,8 @@ describe("bestzip", function () {
     });
 
     afterEach(async function () {
-      try {
-        await fs.rm(extractFolderPath, { recursive: true, force: true });
-      } catch {
-        // ignore
-      }
-      try {
-        await fs.rm(destinationFilePath, { force: true });
-      } catch {
-        // ignore
-      }
+      await fs.rm(extractFolderPath, { recursive: true, force: true });
+      await fs.rm(destinationFilePath, { force: true });
     });
 
     it("should create archive", async function () {
@@ -85,19 +77,11 @@ describe("bestzip", function () {
         validArchiveExtractedFile1Path;
 
       afterEach(async function () {
-        try {
-          await fs.rm(validArchiveExtractFolder, {
-            recursive: true,
-            force: true,
-          });
-        } catch {
-          // ignore
-        }
-        try {
-          await fs.rm(validArchiveFilePath, { force: true });
-        } catch {
-          // ignore
-        }
+        await fs.rm(validArchiveExtractFolder, {
+          recursive: true,
+          force: true,
+        });
+        await fs.rm(validArchiveFilePath, { force: true });
       });
 
       it("should contain valid data after unarchive", async function () {
@@ -150,16 +134,8 @@ describe("bestzip", function () {
     });
 
     afterEach(async function () {
-      try {
-        await fs.rm(extractFolderPath, { recursive: true, force: true });
-      } catch {
-        // ignore
-      }
-      try {
-        await fs.rm(destinationFilePath, { force: true });
-      } catch {
-        // ignore
-      }
+      await fs.rm(extractFolderPath, { recursive: true, force: true });
+      await fs.rm(destinationFilePath, { force: true });
     });
 
     it("should create archive", async function () {
@@ -217,19 +193,11 @@ describe("bestzip", function () {
       });
 
       afterEach(async function () {
-        try {
-          await fs.rm(validArchiveExtractFolder, {
+        await fs.rm(validArchiveExtractFolder, {
             recursive: true,
             force: true,
           });
-        } catch {
-          // ignore
-        }
-        try {
-          await fs.rm(validArchiveFilePath, { force: true });
-        } catch {
-          // ignore
-        }
+        await fs.rm(validArchiveFilePath, { force: true });
       });
 
       it("should contain valid data after unarchive", async function () {

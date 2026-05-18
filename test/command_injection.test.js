@@ -57,7 +57,7 @@ describe("command injection", () => {
 
   for (const [index, testCase] of testCases.entries()) {
     test(
-      `should NOT execute commands from the list of sources: ${index + 1}`,
+      `should NOT execute commands from the list of sources: ${JSON.stringify(testCase)}`,
       { skip: !hasNativeZip },
       async () => {
         try {
