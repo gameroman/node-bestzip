@@ -194,9 +194,9 @@ describe("bestzip", function () {
 
       afterEach(async function () {
         await fs.rm(validArchiveExtractFolder, {
-            recursive: true,
-            force: true,
-          });
+          recursive: true,
+          force: true,
+        });
         await fs.rm(validArchiveFilePath, { force: true });
       });
 
